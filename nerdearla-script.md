@@ -50,21 +50,23 @@ Solo lo que funciona, lo que no, y por qué esa brecha sigue siendo tan grande."
 [Timer: 1:00]
 
 ================================================================================
-SLIDE 3: HOOK / EL PROBLEMA (1:30 - 2:00) - NICO
+SLIDE 3: HOOK / EL PROBLEMA (1:30 - 2:00) - NICO Y SERGIO
 ================================================================================
 
 NICO:
 "Vamos a empezar con esto. Hace poco armé un monitor de consumo de API con un 
 microcontrolador ESP32, una pantalla OLED y Claude como copiloto.
 
-En 2 horas estaba funcionando. Perfecto. Era el 80%.
+En 2 horas estaba funcionando. Perfecto. Era el 80%."
 
-Pero hace 4 meses, implementamos un modelo de desarrollo basado en AI a centenares de devs. 
+SERGIO:
+"En 4 meses implementamos un modelo de desarrollo basado en AI a centenares de devs. 
 Con guardrails claros, estandarización, coherencia. El primer piloto funcionó en 2 semanas.
 
-Lo difícil empezó después.
+Lo difícil empezó después."
 
-Ambas cosas son verdad al mismo tiempo."
+NICO:
+"Ambas cosas son verdad al mismo tiempo."
 
 [Cambiar a SLIDE 4]
 
