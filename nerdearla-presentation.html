@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El 80% de AI es gratis. El 20% restante puede costarte todo.</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0a;
+            --bg-light: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --accent: #ff6b35;
+            --accent-light: #ffa500;
+            --border: #333333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            overflow: hidden;
+            line-height: 1.6;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-dark);
+        }
+
+        .slide {
+            width: 100%;
+            height: 100%;
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 60px;
+            text-align: center;
+            animation: fadeIn 0.5s ease-in;
+            position: relative;
+        }
+
+        .speaker-indicator {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            letter-spacing: 2px;
+            z-index: 99;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Slide styles */
+        .slide-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 30px;
+            letter-spacing: -1px;
+        }
+
+        .slide-subtitle {
+            font-size: 1.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 40px;
+            font-weight: 300;
+        }
+
+        .slide-content {
+            font-size: 1.4rem;
+            max-width: 900px;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .slide-content strong {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .accent-text {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        .speaker-intro {
+            display: flex;
+            gap: 60px;
+            justify-content: center;
+            margin-top: 40px;
+            max-width: 1000px;
+        }
+
+        .speaker {
+            flex: 1;
+            padding: 30px;
+            background: var(--bg-light);
+            border-left: 3px solid var(--accent);
+            border-radius: 4px;
+        }
+
+        .speaker-name {
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .speaker-role {
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        /* Section slides */
+        .section-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .section-number {
+            font-size: 5rem;
+            font-weight: 800;
+            color: var(--accent);
+            opacity: 0.3;
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+        }
+
+        .section-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+        }
+
+        /* Case slides */
+        .case-container {
+            max-width: 850px;
+            text-align: left;
+        }
+
+        .case-title {
+            font-size: 2.2rem;
+            margin-bottom: 40px;
+            color: var(--text-primary);
+            border-bottom: 2px solid var(--accent);
+            padding-bottom: 20px;
+        }
+
+        .case-section {
+            margin-bottom: 35px;
+        }
+
+        .case-label {
+            font-size: 0.9rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .case-text {
+            font-size: 1.2rem;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+
+        /* Quote style */
+        .quote {
+            font-size: 2rem;
+            font-style: italic;
+            color: var(--accent);
+            margin: 40px 0;
+            padding: 30px;
+            border-left: 4px solid var(--accent);
+            background: rgba(255, 107, 53, 0.05);
+        }
+
+        /* Controls */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            z-index: 100;
+        }
+
+        button {
+            background: var(--accent);
+            color: var(--bg-dark);
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 700;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover {
+            background: var(--accent-light);
+        }
+
+        button:disabled {
+            background: var(--border);
+            cursor: not-allowed;
+        }
+
+        .slide-counter {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            font-weight: 600;
+        }
+
+        /* Timer */
+        .timer {
+            position: fixed;
+            top: 30px;
+            right: 30px;
+            font-size: 1.2rem;
+            color: var(--accent);
+            font-weight: 700;
+            font-family: 'Courier New', monospace;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .slide {
+                padding: 40px;
+            }
+            .slide-title {
+                font-size: 2.5rem;
+            }
+            .slide-subtitle {
+                font-size: 1.3rem;
+            }
+            .slide-content {
+                font-size: 1.1rem;
+            }
+            .speaker-intro {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+
+        /* Hide on presenter view */
+        .presenter-only {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="timer" id="timer">00:00</div>
+
+    <div class="speaker-indicator" id="speakerIndicator">N</div>
+
+    <div class="presentation-container">
+        <!-- SLIDE 1: Portada -->
+        <div class="slide active">
+            <div style="max-width: 900px;">
+                <h1 class="slide-title">El 80% de AI es gratis.</h1>
+                <h2 class="slide-title" style="color: var(--accent); margin-bottom: 50px;">El 20% restante puede costarte todo.</h2>
+                <p class="slide-subtitle">Dos perspectivas reales sobre AI en organizaciones de ingeniería</p>
+                <p style="color: var(--text-secondary); font-size: 1.1rem; margin-top: 60px;">Nerdearla Chile 2026</p>
+                <button id="startBtn" onclick="startTimer()" style="margin-top: 60px; padding: 15px 40px; font-size: 1.1rem;">Iniciar</button>
+            </div>
+        </div>
+
+        <!-- SLIDE 2: Presentación conjunta -->
+        <div class="slide">
+            <div style="max-width: 1000px; width: 100%;">
+                <h2 class="slide-title" style="margin-bottom: 50px;">Quiénes somos</h2>
+                <div class="speaker-intro">
+                    <div class="speaker">
+                        <div class="speaker-name">🔧 Nico</div>
+                        <div style="margin-bottom: 15px;">
+                            <img src="nico.jpeg" alt="Nico" style="width: 150px; height: 150px; border-radius: 8px; object-fit: cover;">
+                        </div>
+                        <div class="speaker-role">Tech leader. Construyo cosas con AI día a día: firmware, automatizaciones, prototipos. Vivo el 80%.</div>
+                    </div>
+                    <div class="speaker">
+                        <div class="speaker-name">📊 Sergio</div>
+                        <div style="margin-bottom: 15px;">
+                            <img src="sergio.jpeg" alt="Sergio" style="width: 150px; height: 150px; border-radius: 8px; object-fit: cover;">
+                        </div>
+                        <div class="speaker-role">Escalé la adopción de AI a centenares de devs. Enfrenté el 20%: guardrails, coherencia, confianza.</div>
+                    </div>
+                </div>
+                <p style="margin-top: 60px; color: var(--text-secondary); font-size: 1.2rem;">Somos nerds del café (hasta tostamos en conjunto). Hicimos todas las montañas rusas de 4 parques de Disney en 1 día. Y ahora contamos lo que aprendimos sobre AI en producción. Sin demos de laboratorio. Sin slides de vendors.</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 3: Hook / El problema -->
+        <div class="slide">
+            <div style="max-width: 900px;">
+                <h2 class="slide-title">La promesa cumplida</h2>
+                <div style="margin-top: 60px; text-align: left;">
+                    <div style="margin-bottom: 50px;">
+                        <p style="color: var(--accent); font-size: 1.3rem; margin-bottom: 15px; font-weight: 700;">Nico:</p>
+                        <p class="slide-content">"En 2 horas armé un monitor de consumo de API con ESP32, una pantalla OLED y Claude como copiloto. Funcionaba perfecto. Era el 80%."</p>
+                    </div>
+                    <div>
+                        <p style="color: var(--accent); font-size: 1.3rem; margin-bottom: 15px; font-weight: 700;">Sergio:</p>
+                        <p class="slide-content">"En 4 meses escalamos AI a centenares de devs. El primer piloto funcionó en 2 semanas. Lo difícil empezó después."</p>
+                    </div>
+                </div>
+                <p style="margin-top: 60px; color: var(--accent); font-size: 1.2rem; font-weight: 700;">Ambas cosas son verdad al mismo tiempo.</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 4: El regalo - 80% -->
+        <div class="slide">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">El regalo: el 80%</h2>
+                <p class="section-subtitle">La IA democratizó lo que antes era lento</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 5: Caso Nico #1 - ESP32 -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">📡 Llevando a Claude al mundo físico</h3>
+                
+                <div class="case-section">
+                    <div class="case-label">La idea</div>
+                    <p class="case-text">Conectar un microcontrolador ESP32 a la API de Claude para monitorear tokens consumidos y mostrarlos en un display. Parece simple.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El 80%</div>
+                    <p class="case-text">Lo hiciste funcionar en horas. El ESP32 se comunica con Claude, obtiene datos, los muestra en una pantalla OLED. Velocidad: impresionante.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El choque</div>
+                    <p class="case-text">Cloudflare bloquea requests que no vienen de un navegador autenticado. Tu ESP32 no es un navegador. El 80% de repente no funciona en el contexto real.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El 20%</div>
+                    <p class="case-text">Armaste un mini servidor en tu compu que actúa como proxy. Ahora el ESP32 le pega al servidor local, que a su vez habla con Claude. Funcionó. Pero requirió arquitectura extra, middlewares, capas de indirección.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 5.5: Claude Monitor en acción -->
+        <div class="slide">
+            <div style="max-width: 1000px; width: 100%;">
+                <h2 class="slide-title" style="margin-bottom: 50px;">Claude Monitor</h2>
+                <div style="display: flex; gap: 30px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <p style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 15px;">Hardware</p>
+                        <img src="claude-monitor-hardware.jpeg" alt="Claude Monitor Hardware" style="max-height: 400px; height: auto; border-radius: 12px; border: 2px solid var(--accent); box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);">
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 15px;">App</p>
+                        <img src="claude-monitor-app.jpeg" alt="Claude Monitor App" style="max-height: 400px; height: auto; border-radius: 12px; border: 2px solid var(--accent); box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6: Caso Nico #2 - Mission Control -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">🎛️ Mission Control personal</h3>
+                
+                <div class="case-section">
+                    <div class="case-label">La idea</div>
+                    <p class="case-text">Integrar TODO en un mismo lugar: tareas, datos de salud (Garmin), tracking de paquetes, gastos (tap and pay). Un hub central donde ves todo.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El 80%</div>
+                    <p class="case-text">Lo armaste. Funciona. Tienes visibility total sobre tu vida en un dashboard. AI te ayuda a procesar, conectar puntos, sugerir acciones. Rápido, funcional, tuyo.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El 20%</div>
+                    <p class="case-text">Backup de datos. Seguridad. Notificaciones push. Exposición a internet. Más integraciones. Está en 80% porque es un proyecto personal. Si fuera para vender, eso sería work.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 6.5: Mission Control Screenshots -->
+        <div class="slide">
+            <div style="max-width: 1000px; width: 100%;">
+                <h2 class="slide-title" style="margin-bottom: 50px;">En acción</h2>
+                <div style="display: flex; gap: 30px; justify-content: center; align-items: center; flex-wrap: wrap;">
+                    <div style="text-align: center;">
+                        <p style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 15px;">Dashboard</p>
+                        <img src="mission-control-dashboard.jpeg" alt="Mission Control Dashboard" style="max-height: 400px; height: auto; border-radius: 12px; border: 2px solid var(--accent); box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);">
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 15px;">Health</p>
+                        <img src="mission-control-health.jpeg" alt="Mission Control Health" style="max-height: 400px; height: auto; border-radius: 12px; border: 2px solid var(--accent); box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);">
+                    </div>
+                    <div style="text-align: center;">
+                        <p style="color: var(--accent); font-size: 0.9rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 15px;">Menú</p>
+                        <img src="mission-control-menu.jpeg" alt="Mission Control Menu" style="max-height: 400px; height: auto; border-radius: 12px; border: 2px solid var(--accent); box-shadow: 0 8px 32px rgba(255, 107, 53, 0.2);">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 7: La trampa - 20% -->
+        <div class="slide">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">La trampa: el 20%</h2>
+                <p class="section-subtitle">Donde la curva sube exponencialmente</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 8: Caso Sergio #1 - Desvíos en la fuerza -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">⚠️ Guardrails que se rompen</h3>
+                
+                <div class="case-section">
+                    <div class="case-label">La promesa</div>
+                    <p class="case-text">Implementamos un modelo de desarrollo basado en AI con guardrails claros. Skills específicos. Estandarización. Coherencia predecible.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El 80%</div>
+                    <p class="case-text">Centenas de devs lo adoptaron. Aceleró el development. Todo parecía estar bajo control. Los guardrails funcionaban.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El problema</div>
+                    <p class="case-text">Con el tiempo, el modelo comenzó a desviarse. Devs encontraron formas creativas de saltarse guardrails. El modelo alucina en contextos no previstos. La coherencia que ganamos en el 80% se quiebra.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El 20%</div>
+                    <p class="case-text">Mantener que el modelo siga siendo confiable. Auditar desvíos constantemente. Reentrenar skills. Human in the loop. No es "set and forget". Es trabajo continuo.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 9: Caso Sergio #2 - Clientes que ya llegaron al 80% -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">🚀 El cliente que se adelantó</h3>
+                
+                <div class="case-section">
+                    <div class="case-label">Hace 4 meses</div>
+                    <p class="case-text">Cliente: sin nada de AI en desarrollo. Nos piden ayuda para escalar.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">Hoy</div>
+                    <p class="case-text">Cuando voy a visitarlo, ya tiene una POC armada. Por ellos. No me necesitaban para llegar al 80%. <strong>El 80% ya se democratizó tanto que los clientes lo hacen solos.</strong></p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">Pero...</div>
+                    <p class="case-text">La POC tiene exactamente los problemas que dijimos: desvíos en guardrails, coherencia cuestionable, confianza baja. Ahora sí me necesitan. Para industrializar. Para que no se erosione todo.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">La lección</div>
+                    <p class="case-text">El 80% es gratis. El 20% es lo que se vende ahora.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 10: Caso Sergio #3 - Cyborg engineers -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">💰 Cyborg engineers: el dilema económico</h3>
+                
+                <div class="case-section">
+                    <div class="case-label">Antes</div>
+                    <p class="case-text">Un equipo de desarrollo "completo" era caro. Solo grandes empresas podían pagarlo. El talento senior era limitado y caro.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">Hoy</div>
+                    <p class="case-text">Con cyborg engineers (human + AI), puedes tener capacidad similar por una fracción del costo. El ticket baja. El acceso se democratiza. Startups que antes no podían ahora sí.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">El precio</div>
+                    <p class="case-text">No puedes simplemente bajar el precio y esperar que la calidad se mantenga. El 20% es: ¿cómo mantengo estándares cuando la capacidad es más barata y accesible?</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">La responsabilidad</div>
+                    <p class="case-text">Democratización ≠ Lawlessness. Más acceso requiere <strong>más governance</strong>, no menos.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 11: El patrón -->
+        <div class="slide">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">El patrón</h2>
+                <p class="section-subtitle">Qué separa a quienes lo logran</p>
+            </div>
+        </div>
+
+        <!-- SLIDE 12: Patrones de éxito -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">✅ Quiénes logran cruzar el abismo</h3>
+                
+                <div class="case-section">
+                    <div class="case-label">1. Empiezan aburrido</div>
+                    <p class="case-text">No persiguen el caso de uso "más sexy". Buscan el más controlable, donde puedas medir el éxito sin sorpresas.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">2. Tratan AI como infraestructura</div>
+                    <p class="case-text">No como un proyecto especial. Como un layer más de tu stack. Con SLAs, con monitoreo, con governance.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">3. Miden outcomes reales</div>
+                    <p class="case-text">No "cuántos usan Copilot" sino "cuánto bajó el cycle time". No "qué tan bonito es el modelo" sino "cuántas alucina".</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">4. El liderazgo entiende que el 20% hay que pagarlo</div>
+                    <p class="case-text">Y tiene presupuesto para hacerlo. No es una sorpresa. Es parte del plan desde el día 1.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 13: El anti-patrón -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">❌ El error más común</h3>
+                
+                <div class="quote">
+                    "Llegamos al 80%. Esto es transformación. Misión cumplida."
+                </div>
+
+                <p class="case-text" style="margin-top: 50px;">
+                    No. Están <strong>quedándose en el 80%</strong> y <strong>llamándolo éxito</strong>.
+                </p>
+
+                <p class="case-text" style="margin-top: 30px;">
+                    En una startup o proyecto personal: está bien. El 80% ya da valor.
+                </p>
+
+                <p class="case-text" style="margin-top: 30px;">
+                    En una empresa que vende servicios o productos: ese 80% es un prototipo. El 20% es lo que diferencia el prototipo del producto.
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 13.5: El concepto central (tabla) -->
+        <div class="slide">
+            <div style="max-width: 1000px; width: 100%;">
+                <h2 class="slide-title" style="margin-bottom: 40px;">💡 El concepto central</h2>
+                <div class="quote" style="margin-bottom: 40px;">
+                    "Con AI llegás al 80% en horas. El 20% restante puede costarte meses, o tu empresa."
+                </div>
+                
+                <div style="overflow-x: auto;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 0.95rem;">
+                        <tr style="background: var(--bg-light);">
+                            <th style="padding: 12px; text-align: left; border-bottom: 2px solid var(--border);"></th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid var(--border); color: var(--accent);">Empresa chica / maker</th>
+                            <th style="padding: 12px; text-align: center; border-bottom: 2px solid var(--border); color: var(--accent);">Empresa grande</th>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px; font-weight: 700;">Velocidad</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">El 80% ya es un producto</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">El 80% es un prototipo</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px; font-weight: 700;">Seguridad</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">"Suficientemente bueno"</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">Un CVE, un breach, un titular</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px; font-weight: 700;">Escalabilidad</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">100 usuarios perdonan todo</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">1M usuarios no perdonan nada</td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid var(--border);">
+                            <td style="padding: 12px; font-weight: 700;">Regulación</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">Casi irrelevante</td>
+                            <td style="padding: 12px; text-align: center; color: var(--text-secondary);">Compliance, SOC2, BCRA, CMF...</td>
+                        </tr>
+                        <tr style="background: rgba(255, 107, 53, 0.05);">
+                            <td style="padding: 12px; font-weight: 700; color: var(--accent);">El 20% restante</td>
+                            <td style="padding: 12px; text-align: center; color: var(--accent); font-weight: 700;">Opcional</td>
+                            <td style="padding: 12px; text-align: center; color: var(--accent); font-weight: 700;">No negociable</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 14: Framework de decisión -->
+        <div class="slide">
+            <div class="case-container">
+                <h3 class="case-title">🤔 La pregunta que toda org debe hacerse</h3>
+                
+                <div class="case-section" style="margin-top: 40px;">
+                    <p class="case-text" style="font-weight: 700; color: var(--accent); font-size: 1.3rem;">¿Dónde estoy parado con AI?</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">Es un experimento interno</div>
+                    <p class="case-text">→ El 80% alcanza. Experimenta, aprende, itera.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">Toca datos sensibles o usuarios reales</div>
+                    <p class="case-text">→ El 20% no es opcional. Seguridad, auditoría, confianza son non-negotiable.</p>
+                </div>
+
+                <div class="case-section">
+                    <div class="case-label">Escala a miles de usuarios o devs</div>
+                    <p class="case-text">→ El 20% se multiplica. Cada decisión del modelo impacta a centenares de personas. El costo del error es alto.</p>
+                </div>
+
+                <div class="case-section" style="margin-top: 40px;">
+                    <p class="case-text" style="color: var(--accent); font-weight: 700;">No hay respuesta universal. Hay contexto.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SLIDE 15: Cierre -->
+        <div class="slide">
+            <div style="max-width: 900px;">
+                <h2 class="slide-title">Lo que aprendimos</h2>
+                
+                <div class="quote" style="margin-top: 50px;">
+                    "La AI no es magia ni mentira. Es una herramienta que llegó al 80% más rápido de lo que esperábamos. Lo que hacés con el 20% restante dice todo sobre el tipo de organización que sos."
+                </div>
+
+                <p style="margin-top: 60px; font-size: 1.2rem; color: var(--text-secondary); font-weight: 500;">
+                    Identifica un caso donde estás en el 80%. <strong>Pregúntate conscientemente:</strong> ¿Es una decisión o un descuido?
+                </p>
+            </div>
+        </div>
+
+        <!-- SLIDE 16: Gracias -->
+        <div class="slide">
+            <div>
+                <h2 class="slide-title">Gracias</h2>
+                <p style="color: var(--accent); font-size: 1.5rem; margin-top: 50px; font-weight: 700;">Preguntas?</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" onclick="changeSlide(-1)">← Anterior</button>
+        <span class="slide-counter"><span id="currentSlide">1</span> / <span id="totalSlides">16</span></span>
+        <button id="nextBtn" onclick="changeSlide(1)">Siguiente →</button>
+    </div>
+
+    <script>
+        let currentSlide = 1;
+        const totalSlides = document.querySelectorAll('.slide').length;
+        let startTime = null;
+        let timerStarted = false;
+        const targetDuration = 25 * 60 * 1000; // 25 minutos en ms
+
+        document.getElementById('totalSlides').textContent = totalSlides;
+
+        function startTimer() {
+            if (!timerStarted) {
+                startTime = Date.now();
+                timerStarted = true;
+                document.getElementById('startBtn').disabled = true;
+                document.getElementById('startBtn').textContent = 'Iniciado';
+            }
+        }
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+            
+            if (n > totalSlides) currentSlide = totalSlides;
+            if (n < 1) currentSlide = 1;
+            
+            slides.forEach(slide => slide.classList.remove('active'));
+            slides[currentSlide - 1].classList.add('active');
+            
+            document.getElementById('currentSlide').textContent = currentSlide;
+            document.getElementById('prevBtn').disabled = currentSlide === 1;
+            document.getElementById('nextBtn').disabled = currentSlide === totalSlides;
+            
+            // Actualizar speaker indicator
+            const speakers = {
+                1: "N", 2: "N&S", 3: "N", 4: "N", 5: "N",
+                6: "N", 7: "N", 8: "N", 9: "S", 10: "S",
+                11: "S", 12: "S", 13: "S", 14: "S", 15: "S",
+                16: "S", 17: "S", 18: "N&S", 19: "N&S"
+            };
+            document.getElementById('speakerIndicator').textContent = speakers[currentSlide] || "?";
+        }
+
+        function changeSlide(n) {
+            currentSlide += n;
+            showSlide(currentSlide);
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') changeSlide(1);
+            if (e.key === 'ArrowLeft') changeSlide(-1);
+        });
+
+        // Timer
+        function updateTimer() {
+            if (timerStarted && startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const minutes = Math.floor(elapsed / 60);
+                const seconds = elapsed % 60;
+                document.getElementById('timer').textContent = 
+                    `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+        }
+
+        setInterval(updateTimer, 1000);
+
+        // Initial show
+        showSlide(currentSlide);
+    </script>
+</body>
+</html>
